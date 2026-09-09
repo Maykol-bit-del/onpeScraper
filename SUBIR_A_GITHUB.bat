@@ -33,6 +33,13 @@ if "%GIT_CMD%"=="" (
 echo [OK] Git detectado correctamente.
 echo.
 
+:: Asegurar identidad de Git si no existe
+for /f "tokens=*" %%u in ('"%GIT_CMD%" config user.name 2^>nul') do set "GIT_USER=%%u"
+if "%GIT_USER%"=="" (
+    "%GIT_CMD%" config --global user.name "Maykol-bit-del"
+    "%GIT_CMD%" config --global user.email "maykol@gmail.com"
+)
+
 :: 2. Inicializar repositorio si no existe
 if not exist ".git" (
     echo [INFO] Inicializando repositorio Git en server/...
@@ -50,7 +57,7 @@ if "%REMOTE_URL%"=="" (
     echo.
     echo ========================================================
     echo  Pega la URL de tu repositorio de GitHub para el SERVER:
-    echo  (Ejemplo: https://github.com/tu-usuario/onpe-scraper-api.git)
+    echo  (Ejemplo: https://github.com/Maykol-bit-del/onpeScraper.git)
     echo ========================================================
     set /p REPO_URL="URL de GitHub: "
     
@@ -81,7 +88,7 @@ echo ========================================================
 
 :: 4. Agregar archivos y commit
 "%GIT_CMD%" add .
-"%GIT_CMD%" commit -m "Servidor ONPE Scraper API con Dockerfile y Puppeteer"
+"%GIT_CMD%" commit -m "Servidor ONPE Scraper API con Dockerfile y Puppeteer" 2>nul
 
 echo.
 echo [INFO] Subiendo a GitHub (%REMOTE_URL%)...
