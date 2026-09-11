@@ -33,7 +33,8 @@ if "%GIT_CMD%"=="" (
 echo [OK] Git detectado correctamente.
 echo.
 
-:: Asegurar identidad de Git si no existe
+:: Asegurar identidad y permisos seguros de Git
+"%GIT_CMD%" config --global --add safe.directory "%CD%" >nul 2>&1
 for /f "tokens=*" %%u in ('"%GIT_CMD%" config user.name 2^>nul') do set "GIT_USER=%%u"
 if "%GIT_USER%"=="" (
     "%GIT_CMD%" config --global user.name "Maykol-bit-del"
@@ -44,12 +45,14 @@ if "%GIT_USER%"=="" (
 if not exist ".git" (
     echo [INFO] Inicializando repositorio Git en server/...
     "%GIT_CMD%" init
-    "%GIT_CMD%" branch -M main
 ) else (
     echo [INFO] Repositorio Git existente detectado en server/.
 )
 
-:: 3. Configurar URL del repositorio remoto
+:: 3. Asegurar rama main
+"%GIT_CMD%" branch -M main
+
+:: 4. Configurar URL del repositorio remoto
 set "REMOTE_URL="
 for /f "tokens=*" %%a in ('"%GIT_CMD%" remote get-url origin 2^>nul') do set "REMOTE_URL=%%a"
 
@@ -86,9 +89,9 @@ echo ========================================================
 echo  Preparando y subiendo archivos del servidor...
 echo ========================================================
 
-:: 4. Agregar archivos y commit
+:: 5. Agregar archivos y commit
 "%GIT_CMD%" add .
-"%GIT_CMD%" commit -m "Servidor ONPE Scraper API con Dockerfile y Puppeteer" 2>nul
+"%GIT_CMD%" commit -m "Servidor ONPE Scraper API con Dockerfile y Puppeteer"
 
 echo.
 echo [INFO] Subiendo a GitHub (%REMOTE_URL%)...
@@ -96,7 +99,7 @@ echo [INFO] Subiendo a GitHub (%REMOTE_URL%)...
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
-    echo [AVISO] Sincronizando con force push inicial...
+    echo [AVISO] Sincronizando con force push inicial por si habia archivos previos...
     "%GIT_CMD%" push -u origin main --force
 )
 
